@@ -1,7 +1,7 @@
 @extends('approvalItem::approval')
 
 @section('approval')
-<div class="container bg-white">
+    <div class="container bg-white">
         <div class="row p-4 bg-white">
             <div class="col border border-muted rounded-lg mr-2 p-4">
                 <h6>Request additional investigation</h6>
@@ -25,8 +25,7 @@
                     <h6>Request</h6>
                     <div class="input-group mb-3">
                     </br>
-                        <textarea  class="form-control" rows="3" name="request">
-                        </textarea>
+                        <textarea  class="form-control" rows="3" name="request"></textarea>
                         @error('request')
                             <div class="alert">
                                 <strong>{{ $message }}</strong>
@@ -65,5 +64,10 @@
                 </table>
             </div>
         </div>
-</div>
+        @if($process_item->form_type_id ==5 && $process_item->prerequisite_id != null)
+            <div class="row p-4 bg-white">
+                <button type="submit" class="btn btn-primary" ><a href="/approval-item/assignorganization/{{$process_item->prerequisite_id}}" class="text-dark">Back to {{$process_item->prerequisite_process->form_type->type}}</a></button>
+            </div>
+        @endif
+    </div>
 @endsection

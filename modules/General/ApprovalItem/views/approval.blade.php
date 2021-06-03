@@ -1,16 +1,6 @@
 @extends('general')
 
 @section('general')
-<div class="flex row border-secondary rounded-lg ml-3 justify-content-between">
-    <!-- Sessions to display success or failure -->
-    <span>
-        <h3 class="text-center bg-success text-light">{{session('message')}}</h3>
-    </span>
-    <span>
-        <h3 class="text-center bg-danger text-light">{{session('warning')}}</h3>
-    </span>
-    <span>
-</div>
 <h4>Application Information</h4>
 <hr>
 <div class="container">
@@ -62,7 +52,7 @@
                         <table class="table table-light table-striped border-secondary rounded-lg mr-4">
                             <thead>
                                 <tr>
-                                    <th>Land Size</th>
+                                    <th>Land Size(In acres)</th>
                                     <th>Number of Trees</th>
                                     <th>Number of Tree Species</th>
                                 </tr>
@@ -114,8 +104,8 @@
                                 <tr>
                                     <td>{{$item->title}}</td>
                                     <td>{{$item->environment_restoration_activity->title}}</td>
-                                    <td>{{$item->eco_system->ecosystem_type}}</td>
-                                    <td>{{$item->eco_system->description}}</td>
+                                    <td>{{$item->ecosystems_type->ecosystem_type}}</td>
+                                    <td>{{$item->ecosystems_type->description}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -139,30 +129,50 @@
                         </table>
                     @break
                     @case('5')
-                        <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                    <table class="table table-light table-striped border-secondary rounded-lg mr-4">
                             <thead>
                                 <tr>
-                                    <th>District</th>
-                                    <th>Grama Niladari Division</th>
+                                    <th>Plan No/Land Area</th>
+                                    <th>Surveyor</th>
                                     <th>Protected Area</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    @if($item->district==null)
-                                        <td>Not assigned</td>
-                                    @else
-                                        <td>{{$item->district->district}}</td>
-                                    @endif
-                                    @if($item->gs_division==null)
-                                        <td>Not assigned</td>
-                                    @else
-                                    <td>{{$item->gs_division->gs_division}}</td>
-                                    @endif
+                                    <td>{{$item->title}}</td>
+                                    <td>{{$item->surveyor_name}}</td>
                                     @if($item->special_approval==0)
                                         <td>Not a protected area</td>
                                     @else
                                         <td>Protected area</td>
+                                    @endif
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                            <thead>
+                                <tr>
+                                    <th>Province</th>
+                                    <th>District</th>
+                                    <th>Grama Niladari Division</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    @if($item->province_id ==0)
+                                        <td>Not a protected area</td>
+                                    @else
+                                        <td>{{$item->province->province}}</td>
+                                    @endif
+                                    @if($item->district_id==null)
+                                        <td>Not assigned</td>
+                                    @else
+                                        <td>{{$item->district->district}}</td>
+                                    @endif
+                                    @if($item->gs_division_id==null)
+                                        <td>Not assigned</td>
+                                    @else
+                                    <td>{{$item->gs_division->gs_division}}</td>
                                     @endif
                                 </tr>
                             </tbody>
@@ -172,72 +182,113 @@
             </div>
             <div class="col border border-muted rounded-lg mr-2 p-4">
                 <div id="mapid" style="height:400px;" name="map"></div>
+                @if($process_item->form_type_id !=5)
+                    @if($process_item->status_id == 1 || ( $process_item->status_id ==9 && Auth::user()->role_id < 3))
+                        <button type="submit" class="btn btn-primary" ><a href="/approval-item/assignorganization/{{$land_process->id}}" class="text-dark">View More details</a></button>
+                    @elseif($process_item->status_id ==2 || ( $process_item->status_id ==9 && Auth::user()->role_id < 5))
+                        <button type="submit" class="btn btn-primary" ><a href="/approval-item/assignstaff/{{$land_process->id}}" class="text-dark">View More details</a></button>
+                    @elseif($process_item->status_id > 2 && $process_item->status_id < 9)
+                        <button type="submit" class="btn btn-primary" ><a href="/approval-item/investigate/{{$land_process->id}}" class="text-dark">View More details</a></button>
+                    @endif
+                @endif
             </div>
         </div>
         @if($process_item->form_type_id==1)
-        <div class="row p-4 bg-white"> 
-                <h6>Additional Data</h6>
-                    <table class="table table-light table-striped border-secondary rounded-lg mr-4">
-                        <thead>
-                            <tr>
-                                <th>Number of Mamal Species</th>
-                                <th>Number of Amphibian Species</th>
-                                <th>Number of Reptile Species</th>
-                                <th>Number of Avian Species</th>
-                                <th>Number of Flora Species</th>
-                                <th>Tree Species special notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{$item->no_of_mammal_species}}</td>
-                                <td>{{$item->no_of_amphibian_species}}</td>
-                                <td>{{$item->no_of_reptile_species}}</td>
-                                <td>{{$item->no_of_avian_species}}</td>
-                                <td>{{$item->no_of_flora_species}}</td>
-                                <td>{{$item->species_special_notes}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-        </div>
-        <div class="row p-4 bg-white">
-                <h6>Tree Data</h6>
-                @if(count($data) < 1)
-                    <h1>No data</h1>
-                @else
-                    <table class="table table-light table-striped border-secondary rounded-lg mr-4">
-                        <thead>
-                            <tr>
-                                <th>Tree Species ID</th>
-                                <th>Tree ID</th>
-                                <th>Width at Breast Height</th>
-                                <th>Height</th>
-                                <th>Timber Volume</th>
-                                <th>Timber Cubic</th>
-                                <th>Age</th>
-                                <th>Remark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for($x = 0; $x < count($tree_data); $x++)
-                            <tr>
-                                <td>{{$data[$x]['tree_species_id']}}</td>
-                                <td>{{$data[$x]['tree_id']}}</td>
-                                <td>{{$data[$x]['width_at_breast_height']}}</td>
-                                <td>{{$data[$x]['height']}}</td>
-                                <td>{{$data[$x]['timber_volume']}}</td>
-                                <td>{{$data[$x]['timber_cubic']}}</td>
-                                <td>{{$data[$x]['age']}}</td>
-                                <td>{{$data[$x]['remark']}}</td>
-                            </tr>
-                            @endfor
-                        </tbody>
-                    </table>
-                @endif             
-        </div>
+            <div class="row p-4 bg-white"> 
+                    <h6>Additional Data</h6>
+                        <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                            <thead>
+                                <tr>
+                                    <th>Number of Mamal Species</th>
+                                    <th>Number of Amphibian Species</th>
+                                    <th>Number of Reptile Species</th>
+                                    <th>Number of Avian Species</th>
+                                    <th>Number of Flora Species</th>
+                                    <th>Tree Species special notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{$item->no_of_mammal_species}}</td>
+                                    <td>{{$item->no_of_amphibian_species}}</td>
+                                    <td>{{$item->no_of_reptile_species}}</td>
+                                    <td>{{$item->no_of_avian_species}}</td>
+                                    <td>{{$item->no_of_flora_species}}</td>
+                                    <td>{{$item->species_special_notes}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+            </div>
+            <div class="row p-4 bg-white">
+                    <h6>Tree Data</h6>
+                    @if(count($data) < 1)
+                        <h1>No data</h1>
+                    @else
+                        <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                            <thead>
+                                <tr>
+                                    <th>Tree Species ID</th>
+                                    <th>Tree ID</th>
+                                    <th>Width at Breast Height</th>
+                                    <th>Height</th>
+                                    <th>Timber Volume</th>
+                                    <th>Timber Cubic</th>
+                                    <th>Age</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for($x = 0; $x < count($data); $x++)
+                                <tr>
+                                    <td>{{$data[$x]['tree_species_id']}}</td>
+                                    <td>{{$data[$x]['tree_id']}}</td>
+                                    <td>{{$data[$x]['width_at_breast_height']}}</td>
+                                    <td>{{$data[$x]['height']}}</td>
+                                    <td>{{$data[$x]['timber_volume']}}</td>
+                                    <td>{{$data[$x]['timber_cubic']}}</td>
+                                    <td>{{$data[$x]['age']}}</td>
+                                    <td>{{$data[$x]['remark']}}</td>
+                                </tr>
+                                @endfor
+                            </tbody>
+                        </table>
+                    @endif             
+            </div>
         @endif
-        
-        @if($process_item->form_type_id==2 || $process_item->form_type_id==4 )
+        @if($process_item->form_type_id==3)
+            <div class="row p-4 bg-white">
+                <h6>Species restoration data</h6>
+                <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                    <thead>
+                        <tr>
+                            <th>Species Name</th>
+                            <th>Scientefic Name</th>
+                            <th>Number of species to be restored</th>
+                            <th>Height</th>
+                            <th>Dimentions</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($data as $species)
+                        <tr>
+                            <td>{{$species->Species->title}}</td>
+                            <td>{{$species->Species->scientefic_name}}</td>
+                            <td>{{$species->quantity}}</td>
+                            <td>{{$species->height}}</td>
+                            <td>{{$species->dimensions}}</td>
+                            @if($species->remarks!=null)
+                                <td>No remarks</td>
+                            @else
+                                <td>{{$species->remarks}}</td>
+                            @endif
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>      
+            </div>
+        @endif
+        @if($process_item->form_type_id==1 || $process_item->form_type_id==4 )
             @isset($Photos)
                 <div class="row p-4 bg-white">
                     <div class="card-deck">
@@ -252,6 +303,60 @@
                     </div>
                 </div>
             @endisset
+        @endif
+        @if($process_item->form_type_id==5)
+            @if (count($LandOrganizations) > 0)
+                <div class="row p-4 bg-white">
+                    <h6>Governing Organizations related to the Land Parcel</h6>
+                    <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>City</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($LandOrganizations as $organization)
+                                <tr>
+                                    <td>{{$organization->organization->title}}</td>
+                                    @if($organization->type_id == NULL)
+                                    <td>Not specified</td>
+                                    @else
+                                    <td>{{$organization->organization->type->title}}</td>
+                                    @endif
+                                    <td>{{$organization->organization->city}}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                    </table>
+                </div>
+            @endif
+            @if (count($Land_Gazzettes) > 0)
+                <div class="row p-4 bg-white">
+                    <h6>Gazzettes related to the Land Parcel</h6>
+                    <table class="table table-light table-striped border-secondary rounded-lg mr-4">
+                            <thead>
+                                <tr>
+                                    <th>Gazette Title</th>
+                                    <th>Gazette Number</th>
+                                    <th>Gazzetted Date</th>
+                                    <th>Content</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($Land_Gazzettes as $Gazzette)
+                                <tr>
+                                    <td>{{$Gazzette->gazette->title}}</td>
+                                    <td>{{$Gazzette->gazette->gazette_number}}</td>
+                                    <td>{{$Gazzette->gazette->gazetted_date}}</td>
+                                    <td>{{$Gazzette->gazette->content}}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                    </table>
+                </div>
+            @endif
         @endif
     </div>
 </div>

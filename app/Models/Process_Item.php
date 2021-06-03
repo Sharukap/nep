@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Process_Item extends Model
 {
+    use SoftDeletes;
     use HasFactory;
     protected $table = 'process_items';
 
@@ -36,7 +38,7 @@ class Process_Item extends Model
         'other_land_owner_name' => '',
         'other_removal_requestor_type' => 0,
         'other_removal_requestor_name' => '',
-        'requestor_email' => '',
+        'requestor_email' => "no email",
     ];
 
     public function form_type()
@@ -49,7 +51,7 @@ class Process_Item extends Model
         return $this->belongsTo('App\Models\Status');
     }
 
-    public function prerequisite_id()
+    public function prerequisite_process()
     {
         return $this->belongsTo('App\Models\Process_Item','prerequisite_id');
     }

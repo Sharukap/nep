@@ -10,7 +10,7 @@ class GS_Division extends Model
     use HasFactory;
     protected $table = 'gs_divisions';
 
-    public function tree_removal_requests(){
-        return $this->hasMany('App\Models\Tree_Removal_Request');
+    public function land_parcels(){
+        return $this->hasMany('App\Models\Land_Parcel');
     }
 }

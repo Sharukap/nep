@@ -9,8 +9,10 @@ Route::get('/passwordReset', function() {       // Open view to reset password.
 });
 Route::patch('/alterPassword', [UserController::class, 'alterPassword']);       // Save data to the db.
 
+Route::middleware(['auth'])->group(function () {
 // user/index route will route to the UserController to route based on the user's role  
 Route::get('/index', [UserController::class, 'index'])->name('userIndex'); 
+
 
 ///////ADMIN ACTIONS      
 Route::get('/create', [UserController::class, 'create']);      // Open create view.
@@ -29,4 +31,24 @@ Route::patch('/activate/{id}', [AdminController::class, 'activate']);           
 
 ///////More details button for all users - Admin, HoO and Manager - One route because same functionality
 Route::get('/more/{id}', [UserController::class, 'more']);
+
+//search active users
+Route::get('/searchUsers', [UserController::class, 'searchUsers']);
+//search - activate users
+Route::get('/searchSelfRegistered', [UserController::class, 'searchSelfRegistered']);
+
+//Role Based Access control management
+Route::get('/roleindex',[AdminController::class, 'index'])->name('roleIndex');
+Route::get('/roleedit/{id}',[AdminController::class, 'roleedit'])->name('roleedit');
+Route::post('/rolePriviledge/{id}',[AdminController::class, 'roleupdate']);
+Route::get('/removeAccess/{id}',[AdminController::class, 'accessremove']);
+
+});
+
+
+
+
+
+
+
 

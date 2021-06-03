@@ -34,6 +34,22 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 NEP is Licensed is pending. 
 
+## Packages
+
+1. 
+
+2. https://github.com/spatie/laravel-robots-middleware
+
+3. rezaamini-ir/laravel-easypanel
+
+4. https://github.com/Leaflet/Leaflet.draw
+
+5. https://github.com/mapbox/leaflet-omnivore
+
+6. laravel/fortify
+
+7. 
+
 ## To Run the Program
 
 1. Download the repository

@@ -9,6 +9,15 @@
         <dt class="col-sm-3">Title:</dt>
         <dd class="col-sm-9">{{$development_project->title}}</dd>
 
+        <dt class="col-sm-3">Province:</dt>
+        <dd class="col-sm-9">{{$land->province->province}}</dd>
+
+        <dt class="col-sm-3">District:</dt>
+        <dd class="col-sm-9">{{$land->district->district}}</dd>
+
+        <dt class="col-sm-3">Grama Sevaka Division:</dt>
+        <dd class="col-sm-9">{{$land->gs_division->gs_division}}</dd>
+
         <dt class="col-sm-3">Category:</dt>
         <dd class="col-sm-9">Development Project</dd>
 
@@ -40,25 +49,62 @@
             </ul>
         </dd>
 
+        <dt class="col-sm-3">Request Org:</dt>
+        <!-- @if($process->request_organization) -->
+        <dd class="col-sm-9">{{$process->requesting_organization->title}}</dd>
+        <!-- @else
+        <dd class="col-sm-9">{{$process->other_land_owner_name}}</dd>
+        @endif -->
+
+        <dt class="col-sm-3">Request to Org:</dt>
+        <!-- @if($process->activity_organization) -->
+        <dd class="col-sm-9">{{$process->Activity_organization->title}}</dd>
+        <!-- @else
+        <dd class="col-sm-9">{{$process->other_removal_requestor_name}}</dd>
+        @endif -->
+
         <dt class="col-sm-3">Logs:</dt>
         @if($development_project->logs == 0)
         <dd class="col-sm-9">No Logs</dd>
         @else
-        <dd class="col-sm-9">CONFIGURE CODE TO SHOW LOGS NOT DONE - CURRENTLY SAVING COORDINATES HERE</dd>
+        <dd class="col-sm-9">{{$development_project->logs}}</dd>
         @endif
 
-        <dt class="col-sm-3">Land Parcel:</dt>
+        <dt class="col-sm-3">Plan Number:</dt>
         <dd class="col-sm-9">{{$development_project->land_parcel->title}}</dd>
+
+        <dt class="col-sm-3">Surveyor Name:</dt>
+        <dd class="col-sm-9">{{$development_project->land_parcel->surveyor_name}}</dd>
 
         <dt class="col-sm-3">Status:</dt>
         <dd class="col-sm-9">{{$development_project->status->type}}</dd>
 
         <dt class="col-sm-3">Created at:</dt>
         <dd class="col-sm-9">{{$development_project->created_at}}</dd>
+
+        <dt class="col-sm-3">Active User:</dt>
+        @if($process->activity_user_id == NULL)
+        <dd class="col-sm-9">No User Assigned Yet</dd>
+        @else
+        <dd class="col-sm-9">{{$process->activity_user->name}}</dd>
+        @endif
     </dl>
     <div class="border border-dark border-rounded">
         <div id="mapid" style="height:400px;" name="map"></div>
     </div>
+    @if($process->status_id < 2) 
+    <div class="mt-3" style="float:right;">
+        <!-- <a class="btn btn-outline-warning" href="/dev-project/edit/{{$process->id}}/{{$development_project->id}}/{{$land->id}}">Edit</a> -->
+        <button class="btn btn-outline-danger" onclick="if (confirm('Are you sure you wish to delete this request and all it\'s related data?')){
+            event.preventDefault();
+            document.getElementById('form-delete-{{$process->id}}').submit()}">Delete</button>
+
+        <form id="{{'form-delete-'.$process->id}}" style="display:none" method="post" action="/dev-project/delete/{{$process->id}}/{{$development_project->id}}/{{$land->id}}">
+            @csrf
+            @method('delete');
+        </form>
+</div>
+@endif
 </div>
 
 

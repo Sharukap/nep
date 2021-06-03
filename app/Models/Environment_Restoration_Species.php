@@ -32,4 +32,8 @@ class Environment_Restoration_Species extends Model
     public function environment_restorations(){
         return $this->belongsTo('App\Models\Environment_Restoration');
     }
+
+    public function Species(){
+        return $this->belongsTo('App\Models\Species');
+    }
 }

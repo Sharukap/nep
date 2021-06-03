@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tree_Removal_Request extends Model
 {
+    use SoftDeletes;
     use HasFactory;
 
     protected $table = 'tree_removal_requests';
@@ -26,9 +28,6 @@ class Tree_Removal_Request extends Model
         'species_special_notes',
         'status_id',
         'land_parcel_id',
-        'district_id',
-        'province_id',
-        'gs_division_id',
         'governing_organizations',
         'images',
         'special_approval',
@@ -42,7 +41,7 @@ class Tree_Removal_Request extends Model
     ];
 
     protected $attributes = [
-        'images' => 0,
+        'images' => '{}',
         'special_approval' => 0,
         'tree_locations' => 0,
         'status_id' => 1,
@@ -61,21 +60,6 @@ class Tree_Removal_Request extends Model
     public function status()
     {
         return $this->belongsTo('App\Models\Status');
-    }
-
-    public function gs_division()
-    {
-        return $this->belongsTo('App\Models\GS_Division');
-    }
-
-    public function province()
-    {
-        return $this->belongsTo('App\Models\Province');
-    }
-
-    public function district()
-    {
-        return $this->belongsTo('App\Models\District');
     }
 
     public function land_parcel()

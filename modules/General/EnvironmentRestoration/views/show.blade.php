@@ -14,9 +14,14 @@
 
         <dt class="col-sm-3">Restoration Type:</dt>
         <dd class="col-sm-9">{{$restoration->Environment_Restoration_Activity->title}}</dd>
-        
+
         <dt class="col-sm-3">Ecosystem :</dt>
         <dd class="col-sm-9">{{$restoration->ecosystems_type->type}}</dd>
+
+        @if($land->size != NULL)
+        <dt class="col-sm-3">Land Area/Length:</dt>
+        <dd class="col-sm-9">{{$land->size}} {{$land->size_unit}}</dd>
+        @endif
 
         <dt class="col-sm-3">Governing Organizations:</dt>
         <dd class="col-sm-9">
@@ -51,7 +56,7 @@
         @endif
 
         <dt class="col-sm-3">Land Parcel:</dt>
-        <dd class="col-sm-9">{{$land[0]->title}}</dd>
+        <dd class="col-sm-9">{{$land->title}}</dd>
 
         <dt class="col-sm-3">Status:</dt>
         <dd class="col-sm-9">{{$restoration->Status->type}}</dd>

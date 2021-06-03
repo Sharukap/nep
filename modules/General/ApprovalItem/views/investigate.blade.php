@@ -1,6 +1,9 @@
 @extends('approvalItem::approval')
 
 @section('approval')
+<br>
+<h5 >Review application</h5>
+<hr>
 <div class="container bg-white">
         <div class="row p-4 bg-white">
             <h6>Prerequisites</h6>
@@ -58,8 +61,7 @@
                     <h6>Request</h6>
                     <div class="input-group mb-3">
                     </br>
-                        <textarea  class="form-control" rows="3" name="request">
-                        </textarea>
+                        <textarea  class="form-control" rows="3" name="request"></textarea>
                         @error('request')
                             <div class="alert">
                                 <strong>{{ $message }}</strong>
@@ -131,50 +133,87 @@
             
         </div>
         <div class="row p-4 bg-white">
-            <div class="col border border-muted rounded-lg mr-2 p-4">
-                <h6>Save investigation Porgress<h6>
-                <form action="\approval-item\progresssave\" method="post">
-                            @csrf
-                            <h6>Remark</h6>
-                            <div class="input-group mb-3">
-                            </br>
-                                <textarea  class="form-control" rows="3" name="request">
-                                </textarea>
-                                @error('request')
-                                    <div class="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </div>
-                                @enderror
-                                <input type="hidden" class="form-control" name="create_by" value="{{ Auth::user()->id }}">
-                                <input type="hidden" class="form-control" name="create_organization" value="{{ Auth::user()->organization_id }}">
-                                <input type="hidden" class="form-control" name="process_id" value="{{ $process_item->id }}">
-                            </div>
-                            <h6>Status</h6>
-                            <div class="input-group mb-3">
-                                <select name="status" class="custom-select">
-                                    <option value="0" selected>Select Status</option>
-                                    @foreach($Process_item_statuses as $process_item_status)         
-                                    <option value="{{$process_item_status->id}}">{{$process_item_status->status_title}}</option>
-                                    @endforeach
-                                </select>
-                                @error('status')
-                                <div class="alert">                                   
-                                    <strong>{{ $message }}</strong>
-                                </div>
-                                @enderror
-                            </div>
-                            <div class="form-check">
-                                <button type="submit" class="btn btn-primary" >Update</button>
-                            </div>
-                        </form>
-            </div>
-            <div class="col border border-muted rounded-lg mr-2 p-4">
-                        <h6>Final approval/rejection of application<h6>
-                        <form action="\approval-item\finalapproval\" method="post">
+            <!-- <div class="col border border-muted rounded-lg mr-2 p-4">
+                <h6>Save investigation Progress<h6>
+                <form action="\approval-item\progresssave\" type="post" method="post">
                     @csrf
                     <h6>Remark</h6>
                     <div class="input-group mb-3">
-                    </br>
+                        </br>
+                        <textarea  class="form-control" rows="3" name="request">
+                        </textarea>
+                        @error('request')
+                            <div class="alert">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                        <input type="hidden" class="form-control" name="create_by" value="{{ Auth::user()->id }}">
+                        <input type="hidden" class="form-control" name="create_organization" value="{{ Auth::user()->organization_id }}">
+                        <input type="hidden" class="form-control" name="process_id" value="{{ $process_item->id }}">
+                    </div>
+                    <h6>Status</h6>
+                    <div class="input-group mb-3">
+                        <select name="status" class="custom-select">
+                            <option value="0" selected>Select Status</option>
+                            @foreach($Process_item_statuses as $process_item_status)         
+                                <option value="{{$process_item_status->id}}">{{$process_item_status->status_title}}</option>
+                            @endforeach
+                        </select>
+                        @error('status')
+                            <div class="alert">                                   
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-check">
+                        <button type="submit" class="btn btn-primary" >Update</button>
+                    </div>
+                </form>
+            </div> -->
+            <div class="col border border-muted rounded-lg mr-2 p-4">
+                <h6>Save investigation Progress</h6>
+                <br>
+                <form action="\approval-item\progresssave" method="post">
+                    @csrf
+                    <h6>Remark</h6>
+                    <div class="input-group mb-3">
+                        </br>
+                        <textarea  class="form-control" rows="3" name="request"></textarea>
+                        @error('request')
+                            <div class="alert">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                        <input type="hidden" class="form-control" name="create_by" value="{{ Auth::user()->id }}">
+                        <input type="hidden" class="form-control" name="create_organization" value="{{ Auth::user()->organization_id }}">
+                        <input type="hidden" class="form-control" name="process_id" value="{{ $process_item->id }}">
+                    </div>
+                    <h6>Status</h6>
+                    <div class="input-group mb-3">
+                        <select name="status" class="custom-select">
+                            <option value="0" selected>Select Status</option>
+                            @foreach($Process_item_statuses as $process_item_status)         
+                                <option value="{{$process_item_status->id}}">{{$process_item_status->status_title}}</option>
+                            @endforeach
+                        </select>
+                        @error('status')
+                            <div class="alert">                                   
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-check">
+                        <button type="submit" class="btn btn-primary" >Update</button>
+                    </div>
+                </form>
+            </div>
+            <!-- <div class="col border border-muted rounded-lg mr-2 p-4">
+                <h6>Final approval/rejection of application<h6>
+                <form action="\approval-item\finalapproval\" type="post" method="post">
+                    @csrf
+                    <h6>Remark</h6>
+                    <div class="input-group mb-3">
+                        </br>
                         <textarea  class="form-control" rows="3" name="request">
                         </textarea>
                         @error('request')
@@ -203,7 +242,50 @@
                         <button type="submit" class="btn btn-primary" >Update</button>
                     </div>
                 </form>
+            </div> -->
+            <div class="col border border-muted rounded-lg mr-2 p-4">
+                <h6>Final Decision</h6>
+                <br>
+                <form action="\approval-item\finalapproval" method="post">
+                    @csrf
+                    <h6>Remark</h6>
+                    <div class="input-group mb-3">
+                        </br>
+                        <textarea  class="form-control" rows="3" name="request"></textarea>
+                        @error('request')
+                            <div class="alert">
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                        <input type="hidden" class="form-control" name="create_by" value="{{ Auth::user()->id }}">
+                        <input type="hidden" class="form-control" name="create_organization" value="{{ Auth::user()->organization_id }}">
+                        <input type="hidden" class="form-control" name="process_id" value="{{ $process_item->id }}">
+                    </div>
+                    <h6>Status</h6>
+                    <div class="input-group mb-3">
+                        <select name="status" class="custom-select">
+                            <option value="0" selected>Select Status</option>         
+                            <option value="4">Not Approved</option>
+                            <option value="5">Approved</option>
+                        </select>
+                        @error('status')
+                            <div class="alert">                                   
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-check">
+                        <button type="submit" class="btn btn-primary" >Update</button>
+                    </div>
+                </form>
             </div>
         </div>
+        @if($process_item->form_type_id ==5 && $process_item->prerequisite_id != null)
+            <div class="container">
+                <div class="row p-4 bg-white">
+                    <button type="submit" class="btn btn-primary" ><a href="/approval-item/investigate/{{$process_item->prerequisite_id}}" class="text-dark">Back to {{$process_item->prerequisite_process->form_type->type}}</a></button>
+                </div>
+            </div>
+        @endif
 </div>
 @endsection

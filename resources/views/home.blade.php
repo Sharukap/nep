@@ -20,6 +20,12 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+
+    <!-- Search for laravel -->
+    <script src="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet/0.0.1-beta.5/esri-leaflet.js"></script>
+    <script src="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.5/esri-leaflet-geocoder.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.5/esri-leaflet-geocoder.css">
 
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
@@ -38,23 +44,33 @@
                         <!-- Links -->
                         <ul class="navbar-nav">
                             <li class="nav-item mt-5">
-                                <a class="nav-link text-light" href="/general/pending"><i class="fa fa-home mr-3" aria-hidden="true"></i> General Module</a>
+                                <a class="nav-link text-light" href="/general/pending"><i class="fa fa-fw fa-home mr-3" aria-hidden="true"></i> General</a>
                             </li>
                             <li class="nav-item mt-3">
-                                <a class="nav-link text-light" href="/user/index"><i class="fa fa-user mr-3" aria-hidden="true"></i> User Management</a>
+                                <a class="nav-link text-light" href="/user/index"><i class="fa fa-fw fa-user mr-3" aria-hidden="true"></i> Users</a>
                             </li>
                             <li class="nav-item mt-3">
-                                <a class="nav-link text-light" href="/environment/updatedata"><i class="fa fa-tree mr-3" aria-hidden="true"></i> Environment Module</a>
+                                <a class="nav-link text-light" href="/environment/updatedata"><i class="fa fa-fw fa-tree mr-3" aria-hidden="true"></i> Environment</a>
                             </li>
                             <li class="nav-item mt-3">
-                                <a class="nav-link text-light" href="/glad"><i class="fa fa-globe mr-3" aria-hidden="true"></i> Tracking</a>
+                                <a class="nav-link text-light" href="/glad"><i class="fa fa-fw fa-globe mr-3" aria-hidden="true"></i> Tracking</a>
                             </li>
                             <li class="nav-item mt-3">
-                                <a class="nav-link text-light" href="/approval-item/showRequests"><i class="fa fa-arrow-down mr-3" aria-hidden="true"></i> Requests</a>
+                                <a class="nav-link text-light" href="/approval-item/showRequests"><i class="fa fa-fw fa-arrow-down mr-3" aria-hidden="true"></i> Requests</a>
                             </li>
-                            <li class="nav-item mt-3">
-                                <a class="nav-link text-light" href="/reporting/overview"><i class="fa fa-book mr-3" aria-hidden="true"></i> Reporting</a>
+                            @if(Auth::user()->role_id < 3)
+                                <li class="nav-item mt-3">
+                            @else
+                                <li class="nav-item mt-3" style="margin-bottom:400px;">
+                            @endif
+                                    <a class="nav-link text-light" href="/reporting/overview"><i class="fa fa-fw fa-book mr-3" aria-hidden="true"></i> Reporting</a>
+                                </li>
+                            @if(Auth::user()->role_id < 3)
+                            <li class="nav-item mt-3" style="margin-bottom:400px;">
+                                <a class="nav-link text-light" href="/general/systemSetting"><i class="fa fa-fw fa-cog mr-3" aria-hidden="true"></i> System Settings</a>
                             </li>
+                            @endif
+                            <li class="nav-item mt-3"></li>
                         </ul>
                     </nav>
                 </div>
@@ -99,7 +115,7 @@
                             @if($notification->type == "App\Notifications\ApplicationMade")
                             <a href="/approval-item/assignorganization/{{$notification->data['process_id']}}"><i class="ni ni-single-02"></i><span>
                                     <li>
-                                        <p>New {{$notification->data['type']}} application No {{$notification->data['form_id']}} has been made.</p></i>
+                                        <p>New {{$notification->data['type']}} application No {{$notification->data['form_id']}} {{$notification->data['action']}} .</p></i>
                                 </span></a>
                             @endif
                             @if($notification->type == "App\Notifications\prereqmemo")

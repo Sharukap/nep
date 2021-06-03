@@ -1,31 +1,34 @@
 @extends('general')
 
 @section('general')
-<span>
-    <h3 class="text-center bg-success text-light">{{session('message')}}</h3>
-</span>
 <hr>
 <div class="row justify-content-center">
     <div class="col-md-3">
         <div class="card">
             <div class="card-header bg-white text-center">Tree Removals This Month</div>
             <div class="card-body text-center">
-                <p class="card-text display-1">12</p>
+                <p class="card-text display-4">{{$tree_removals}}</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card">
-            <div class="card-header bg-white text-center">Tree Removals This Month</div>
+            <div class="card-header bg-white text-center">Development Projects This Month</div>
             <div class="card-body text-center">
-                <p class="card-text display-1">5</p>
+                <p class="card-text display-4">{{$dev_projects}}</p>
             </div>
         </div>
     </div>
 </div>
 <hr>
 <div class="row border-secondary rounded-lg ml-3">
+    @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
     <h5 class="p-3">New requests to confirm Organization assigning</h5>
+    @elseif(Auth::user()->role_id == 3 || Auth::user()->role_id == 4 )
+    <h5 class="p-3">New requests to be assigned to staff</h5>
+    @elseif(Auth::user()->role_id == 5) 
+    <h5 class="p-3">Applications to be investigated</h5>
+    @endif
 </div>
 <form action="/general/filterItems" method="get">
     @csrf
@@ -66,7 +69,7 @@
         </thead>
         <tbody>
             @foreach($Process_items as $process_item)<tr>
-            @if($process_item->form_type_id != 5)
+            @if($process_item->prerequisite_id == null )
                 <td>{{$process_item->form_type->type}}</td>
                 <td>{{date('d-m-Y',strtotime($process_item->created_at))}}</td>
                 @if($process_item->request_organization==null && $process_item->other_land_owner_name==null)

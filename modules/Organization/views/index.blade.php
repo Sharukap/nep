@@ -11,7 +11,7 @@
     </span>
     <span>
         <!-- opens the create view -->
-        <a href="/organization/create" class="btn btn-info mr-4" role="button">Create Organization</a>
+        <a href="/organization/create1" class="btn btn-info mr-4" role="button">Create Organization</a>
     </span>
     <table class="table table-light table-striped border-secondary rounded-lg mt-2 mr-4">
         <thead>

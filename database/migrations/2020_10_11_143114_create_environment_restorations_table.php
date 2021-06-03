@@ -34,7 +34,7 @@ class CreateEnvironmentRestorationsTable extends Migration
                 {[species_id, count, remarks, amendments, amended_by, amended_on]}
             */
             $table->foreign('environment_restoration_activity_id','era_id_foreign')->references('id')->on('environment_restoration_activities')->onDelete('cascade');
-            $table->foreign('eco_system_id')->references('id')->on('eco_systems')->onDelete('cascade');
+            $table->foreign('eco_system_id')->references('id')->on('ecosystems_types')->onDelete('cascade');
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
             $table->foreign('land_parcel_id')->references('id')->on('land_parcels')->onDelete('cascade');
         });

@@ -38,8 +38,14 @@ class Organization extends Model
 
     public function type()
     {
-        return $this->belongsTo(\App\Models\Type::class, 'type_id');
+        return $this->belongsTo('App\Models\Type');
     }
+
+    public function branch_type()
+    {
+        return $this->belongsTo('App\Models\Branch_Type');
+    }
+    
 
     // A user belongs to one organization and an organization has many users.
     public function users()

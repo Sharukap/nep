@@ -166,7 +166,7 @@
             <div class="row p-4 bg-white">
                 <div class="col border border-muted rounded-lg mr-2 p-4">
                     <h6>Tree Data</h6>
-                    @if(count($tree_data) < 1)
+                    @if(count($data) < 1)
                         <h1>No data</h1>
                     @else
                         <table class="table table-light table-striped border-secondary rounded-lg mr-4">
@@ -180,13 +180,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for($x = 0; $x < count($tree_data); $x++)
+                                @for($x = 0; $x < count($data); $x++)
                                 <tr>
-                                    <td>{{$tree_data[$x]['tree_id']}}</td>
-                                    <td>{{$tree_data[$x]['tree_species_id']}}</td>
-                                    <td>{{$tree_data[$x]['width_at_breast_height']}}</td>
-                                    <td>{{$tree_data[$x]['height']}}</td>
-                                    <td>{{$tree_data[$x]['timber_volume']}}</td>
+                                    <td>{{$data[$x]['tree_id']}}</td>
+                                    <td>{{$data[$x]['tree_species_id']}}</td>
+                                    <td>{{$data[$x]['width_at_breast_height']}}</td>
+                                    <td>{{$data[$x]['height']}}</td>
+                                    <td>{{$data[$x]['timber_volume']}}</td>
                                 </tr>
                                 @endfor
                             </tbody>
@@ -201,12 +201,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for($x = 0; $x < count($tree_data); $x++)
+                                @for($x = 0; $x < count($data); $x++)
                                 <tr>
-                                    <td>{{$tree_data[$x]['tree_id']}}</td>
-                                    <td>{{$tree_data[$x]['timber_cubic']}}</td>
-                                    <td>{{$tree_data[$x]['age']}}</td>
-                                    <td>{{$tree_data[$x]['remark']}}</td>
+                                    <td>{{$data[$x]['tree_id']}}</td>
+                                    <td>{{$data[$x]['timber_cubic']}}</td>
+                                    <td>{{$data[$x]['age']}}</td>
+                                    <td>{{$data[$x]['remark']}}</td>
                                 </tr>
                                 @endfor
                             </tbody>

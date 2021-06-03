@@ -61,5 +61,12 @@
             </div>
         </div>
     </div>
+    @if($process_item->form_type_id ==5 && $process_item->prerequisite_id != null)
+            <div class="container">
+                <div class="row p-4 bg-white">
+                    <button type="submit" class="btn btn-primary" ><a href="/approval-item/assignorganization/{{$process_item->prerequisite_id}}" class="text-dark">Back to {{$process_item->prerequisite_process->form_type->type}}</a></button>
+                </div>
+            </div>
+    @endif
 </div>
 @endsection

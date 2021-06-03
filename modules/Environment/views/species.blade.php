@@ -2,8 +2,12 @@
 
 @section('cont')
 <kbd><a href="/environment/updatedataspecies" class="text-white font-weight-bolder"><i class="fas fa-chevron-left"></i></i> BACK</a></kbd>
-
 <div class="container">
+    <!-- FAQ button -->
+    <div class="d-flex mb-2 justify-content-end">
+        <span><a title="FAQ" style="font-size:24px;cursor:pointer;" data-toggle="modal" data-target="#speciesHelp"><i class="fa fa-info-circle" aria-hidden="true"></i></a></span>
+    </div>
+    @include('faq')
     <h4 style="text-align:center;" class="text-dark">Add New Species</h4>
     <hr>
     <div class="row justify-content-md-center border p-4 bg-white">
@@ -51,7 +55,13 @@
 
                         </br>
                         <div class="form-group">
-                            District:<input type="text" class="form-control typeahead2 @error('district') is-invalid @enderror" value="{{ old('district') }}" placeholder="Search" name="district" />
+                            <label for="province">District:</label>
+                            <select class="custom-select @error('district') is-invalid @enderror" name="district">
+                                <option disabled selected value="">Select</option>
+                                @foreach ($districts as $district)
+                                <option value="{{ $district->id }}" {{ Request::old()?(Request::old('district')==$district->id?'selected="selected"':''):'' }}>{{ $district->district }}</option>
+                                @endforeach
+                            </select>
                             @error('district')
                             <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -104,10 +114,10 @@
                             </div>
                         </div>
                         <label>Project Description</label>
-                            <textarea class="form-control" rows="5" name="description"></textarea>
-                            @error('description')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                                @enderror
+                        <textarea class="form-control" rows="5" name="description"></textarea>
+                        @error('description')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                         </br>
                         </br>
 
@@ -136,128 +146,86 @@
                 </div>
         </div>
         </form>
-
     </div>
-    <script type="text/javascript">
-        var path2 = "{{route('district')}}";
-        $('input.typeahead2').typeahead({
-            source: function(terms, process) {
-
-                return $.get(path2, {
-                    terms: terms
-                }, function(data) {
-                    console.log(data);
-                    objects = [];
-                    data.map(i => {
-                        objects.push(i.district)
-                    })
-                    console.log(objects);
-                    return process(objects);
-                })
-            },
-        });
-        var path = "{{route('gazette')}}";
-        $('input.typeahead').typeahead({
-            source: function(terms, process) {
-
-                return $.get(path, {
-                    terms: terms
-                }, function(data) {
-                    console.log(data);
-                    objects = [];
-                    data.map(i => {
-                        objects.push(i.gazette_number)
-                    })
-                    console.log(objects);
-                    return process(objects);
-                })
-            },
-        });
-
-        //THIS USES THE AUTOMECOMPLETE FUNCTION IN TREE REMOVAL CONTROLLER
-        var path3 = "{{route('organization')}}";
-        $('input.typeahead3').typeahead({
-            source: function(terms, process) {
-
-                return $.get(path3, {
-                    terms: terms
-                }, function(data) {
-                    console.log(data);
-                    objects = [];
-                    data.map(i => {
-                        objects.push(i.title)
-                    })
-                    console.log(objects);
-                    return process(objects);
-                })
-            },
-        });
-
-
-        ///SCRIPT FOR THE MAP
-        var center = [7.2906, 80.6337];
-
-        // Create the map
-        var map = L.map('mapid').setView(center, 10);
-
-        // Set up the OSM layer 
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: 'Data © <a href="http://osm.org/copyright">OpenStreetMap</a>',
-                maxZoom: 18
-            }).addTo(map);
-
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
-
-        var drawControl = new L.Control.Draw({
-            position: 'topright',
-            draw: {
-                polygon: {
-                    shapeOptions: {
-                        color: 'purple'
-                    },
-                    allowIntersection: false,
-                    drawError: {
-                        color: 'orange',
-                        timeout: 1000
-                    },
-                    showArea: true,
-                    metric: false,
-                    repeatMode: true
-                },
-                polyline: {
-                    shapeOptions: {
-                        color: 'red'
-                    },
-                },
-                circlemarker: false,
-                rect: {
-                    shapeOptions: {
-                        color: 'green'
-                    },
-                },
-                circle: false,
-            },
-            edit: {
-                featureGroup: drawnItems
-            }
-        });
-        map.addControl(drawControl);
-
-        map.on('draw:created', function(e) {
-            var type = e.layerType,
-                layer = e.layer;
-
-            if (type === 'marker') {
-                layer.bindPopup('A popup!');
-            }
-
-            drawnItems.addLayer(layer);
-            $('#polygon').val(JSON.stringify(layer.toGeoJSON()));
-
-
-        });
-    </script>
 </div>
+<script type="text/javascript">
+    ///SCRIPT FOR THE MAP
+    var center = [7.2906, 80.6337];
+
+    // Create the map
+    var map = L.map('mapid').setView(center, 10);
+
+    // Set up the OSM layer 
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Data © <a href="http://osm.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    var drawControl = new L.Control.Draw({
+        position: 'topright',
+        draw: {
+            polygon: {
+                shapeOptions: {
+                    color: 'purple'
+                },
+                allowIntersection: false,
+                drawError: {
+                    color: 'orange',
+                    timeout: 1000
+                },
+                showArea: true,
+                metric: false,
+                repeatMode: true
+            },
+            polyline: {
+                shapeOptions: {
+                    color: 'red'
+                },
+            },
+            circlemarker: false,
+            rect: {
+                shapeOptions: {
+                    color: 'green'
+                },
+            },
+            circle: false,
+        },
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+    map.addControl(drawControl);
+
+    map.on('draw:created', function(e) {
+        var type = e.layerType,
+            layer = e.layer;
+
+        if (type === 'marker') {
+            layer.bindPopup('A popup!');
+        }
+
+        drawnItems.addLayer(layer);
+        $('#polygon').val(JSON.stringify(layer.toGeoJSON()));
+    });
+
+    //SEARCH FUNCTIONALITY
+    var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+
+    var results = new L.LayerGroup().addTo(map);
+
+    searchControl.on('results', function(data) {
+        results.clearLayers();
+        for (var i = data.results.length - 1; i >= 0; i--) {
+            results.addLayer(L.marker(data.results[i].latlng));
+        }
+    });
+
+    setTimeout(function() {
+        $('.pointer').fadeOut('slow');
+    }, 3400);
+</script>
 @endsection

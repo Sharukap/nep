@@ -11,12 +11,18 @@ use App\Models\Process_Item;
 use App\Models\Env_type;
 use App\Models\Species;
 use App\Models\User;
+use App\Models\District;
+use App\Models\Province;
+use App\Models\GS_Division;
+use App\Models\Gazette;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ApplicationMade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use App\CustomClass\organization_assign;
+use App\CustomClass\lanparcel_creation;
 
 class EnvironmentRestorationController extends Controller
 {
@@ -43,11 +49,19 @@ class EnvironmentRestorationController extends Controller
         $organizations = Organization::where('type_id', '=', '1')->get(); //show all records for all government organizations
         $restoration_activities = Environment_Restoration_Activity::all();
         $ecosystems = Env_type::all();
+        $province = Province::all();
+        $district = District::all();
+        $gazettes = Gazette::all();
+        $gs = GS_Division::orderBy('gs_division')->get();
         return view('environmentRestoration::create', [
             'restorations' => $restorations,
             'organizations' => $organizations,
+            'gazettes' => $gazettes,
             'restoration_activities' => $restoration_activities,
-            'ecosystems' => $ecosystems
+            'ecosystems' => $ecosystems,
+            'provinces' => $province,
+            'districts' => $district,
+            'gs' => $gs,
         ]);
     }
 
@@ -58,12 +72,12 @@ class EnvironmentRestorationController extends Controller
         //$restoration = Environment_Restoration::find($id);
         // $species = Environment_Restoration_Species::find($restoration->id); 
         $species = Environment_Restoration_Species::where('environment_restoration_id', ($restoration->id))->get();
-        $land = Land_Parcel::where('id', ($restoration->id))->get();
+        $land = Land_Parcel::find($restoration->land_parcel_id);
         $polygon = $land->pluck('polygon')->first();
         //ddd($restoration->environment_restoration_activity_id);
         //ddd($restoration->Environment_Restoration_Activity->title);
         //ddd($restoration->ecosystems_type->type);
-        $govorgs=$land->pluck('governing_organizations');
+        $govorgs = $land->pluck('governing_organizations');
         //ddd($land->title);
         //ddd($restoration->Status);
         return view('environmentRestoration::show', [
@@ -71,7 +85,7 @@ class EnvironmentRestorationController extends Controller
             'species' => $species,
             'land' => $land,
             'polygon' => $polygon,
-            'govorgs'=>$govorgs
+            'govorgs' => $govorgs
         ]);
     }
 
@@ -79,60 +93,69 @@ class EnvironmentRestorationController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'landparceltitle' => 'required',
+            'planNo' => 'required',
+            'province' => 'required',
+            'district' => 'required',
+            'gs_division' => 'required',
             'environment_restoration_activity' => 'required',
             'environment_restoration_activity' => 'required',
             'ecosystem' => 'required',
-            'activity_org' => 'required|exists:organizations,title',
+            'activity_org' => 'nullable|exists:organizations,title',
             'polygon' => 'required'
         ]);
         DB::transaction(function () use ($request) {
 
-            $landparcel = new Land_Parcel();
-            $landparcel->title = request('landparceltitle');
-            $landparcel->polygon = request('polygon');
-            $landparcel->governing_organizations = request('govOrg');
-            $landparcel->protected_area = request('isProtected');
-            $landparcel->created_by_user_id = request('created_by');
-            $landparcel->save();
-
-            $latest = Land_Parcel::latest()->first();
-            $newland = $latest->id;
-
+            $newland =lanparcel_creation::land_save($request);
+            
             $restoration = new Environment_Restoration();
             $restoration->title = request('title');
             $restoration->environment_restoration_activity_id = request('environment_restoration_activity');
             $restoration->organization_id = request('organization');
             $restoration->eco_system_id = request('ecosystem');
             $restoration->land_parcel_id = $newland;
-            $restoration->created_by_user_id = request('created_by');
+            $restoration->created_by_user_id = request('createdBy');
             $restoration->status = request('status');
-
             $restoration->save();
+
             $latest = Environment_Restoration::latest()->first();
             $newres = $latest->id;
-            $activityorgname = request('activity_org');
-            $activityorgid = Organization::where('title', $activityorgname)->pluck('id');
             
             //restoration process item
             $Process_item = new Process_Item();
             $Process_item->form_id = $latest->id;
             $Process_item->form_type_id = 3;
-            $Process_item->created_by_user_id = request('created_by');
-            $Process_item->activity_organization = $activityorgid[0];
-            $Process_item->request_organization = request('organization');
-            $Process_item->activity_user_id = 0;
-            $Process_item->prerequisite_id = 0;
+            $Process_item->created_by_user_id = request('createdBy');
+            if($request->filled('activity_org')){
+                $activityorgid = Organization::where('title', request('activity_org'))->pluck('id');
+                $Process_item->activity_organization = $activityorgid[0];
+            }
+            $Process_item->request_organization = Auth::user()->organization_id;
+            $Process_item->prerequisite_id = null;
             $Process_item->prerequisite = 0;
             $Process_item->status_id = 1;
             $Process_item->save();
             //+
             $latestprocess = Process_Item::latest()->first();
+            if(empty($request->input('activity_org'))){
+                organization_assign::auto_assign($latestprocess->id,request('district'),request('province'));
+                $latestprocess =Process_Item::latest()->first();
+            }
+            else{
+                $Admins = User::where('organization_id',$latestprocess->activity_organization)->whereBetween('role_id', [1, 2])->get();
+                Notification::send($Admins, new ApplicationMade($latestprocess));
+            }
+            $process = new Process_Item();
+            $process->form_type_id = 5;
+            $process->form_id = $newland;
+            $process->created_by_user_id = request('createdBy');
+            $process->request_organization = Auth::user()->organization_id;
+            $process->activity_organization = $latestprocess->activity_organization;
+            $process->status_id = $latestprocess->status_id;
+            $process->prerequisite_id = $latestprocess->id;
+            $process->prerequisite = 0;
+            $process->save();
 
-            //creating a notification for restoration made
-            $users = User::where('role_id', '<', 3)->get();
-            Notification::send($users, new ApplicationMade($Process_item));
-
+            
             //Adding to Environment Restoration Species Table using ajax
             $rules = array(
                 'statusSpecies.*'  => 'required',
@@ -148,7 +171,7 @@ class EnvironmentRestorationController extends Controller
                     'error'  => $error->errors()->all()
                 ]);
             }
-
+            
             $statusSpecies = $request->statusSpecies;
             $species_names = $request->species_name;
             $quantity = $request->quantity;
@@ -172,17 +195,8 @@ class EnvironmentRestorationController extends Controller
             Environment_Restoration_Species::insert($insert_data);
 
             //land request process item
-            $latest = Land_Parcel::latest()->first();
-            $process = new Process_Item();
-            $process->form_type_id = 5;
-            $process->form_id = $latest->id;
-            $process->created_by_user_id = request('created_by');
-            $process->activity_user_id = 0;
-            $process->request_organization = request('organization');
-            $process->activity_organization = $activityorgid[0];
-            $process->prerequisite_id = $latestprocess->id;
-            $process->prerequisite = 0;
-            $process->save();
+            
+            
         });
 
         return redirect('/general/pending')->with('message', 'Restoration Request Created Successfully');

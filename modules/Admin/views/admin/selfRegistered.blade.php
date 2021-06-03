@@ -1,17 +1,31 @@
 @extends('home')
 
 @section('cont')
-<h3 class="p-3 display-4" style="display:inline">Activate Users</h3>
-<input type="text" 
-    style=" float: right; padding: 6px; margin-top: 20px; margin-right: 16px;border: none;font-size: 17px;" 
-    placeholder="Search..." size="30">
+<div>
+    <kbd><a href="/user/index" class="text-white font-weight-bolder"><i class="fas fa-chevron-left"></i></i> BACK</a></kbd>
+</div><br>
+<div class="row">
+    <div class="col-md-8">
+        <h3 class="p-3 display-4">Activate Users</h3>
+    </div>
+
+    <!-- Search Bar and Buttons -->
+    <div class="col-md-4 mt-5">
+        <form action="/user/searchSelfRegistered" method="get">
+            <div class="input-group">
+                <input type="search" class="form-control" name="search" placeholder="Search Self Registered Users">
+                <span class="form-group-button">
+                    <button type="submit" class="btn btn-primary ml-2"><i class="fa fa-search" aria-hidden="true"></i></button>
+                    <a class="btn btn-warning ml-1" href="/admin/showSelfRegistered"><i class="fa fa-retweet" aria-hidden="true"></i></a>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
 <hr>
 <div class="flex row border-secondary rounded-lg ml-3">
     <span>
         <h5 class="p-3">User Details</h5>
-    </span>
-    <span class="ml-5">
-        <h3 class="text-center bg-success text-light">{{session('message')}}</h3>
     </span>
 
 

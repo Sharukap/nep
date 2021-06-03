@@ -7,8 +7,20 @@
 <div class="container">
 
     <dl class="row">
-        <dt class="col-sm-3">Title:</dt>
+        <dt class="col-sm-3">Plan Number:</dt>
         <dd class="col-sm-9">{{$land->title}}</dd>
+
+        <dt class="col-sm-3">Surveyor Name:</dt>
+        <dd class="col-sm-9">{{$land->surveyor_name}}</dd>
+
+        <dt class="col-sm-3">Province:</dt>
+        <dd class="col-sm-9">{{$land->province->province}}</dd>
+
+        <dt class="col-sm-3">District:</dt>
+        <dd class="col-sm-9">{{$land->district->district}}</dd>
+
+        <dt class="col-sm-3">Grama Sevaka Division:</dt>
+        <dd class="col-sm-9">{{$land->gs_division->gs_division}}</dd>
 
         <dt class="col-sm-3">Governing Organizations:</dt>
         <dd class="col-sm-9">
@@ -44,10 +56,27 @@
 
         <dt class="col-sm-3 text-truncate">Created at:</dt>
         <dd class="col-sm-9">{{$land->created_at}}</dd>
+
+        <dt class="col-sm-3">Active User:</dt>
+        @if($process->activity_user_id == NULL)
+        <dd class="col-sm-9">No User Assigned Yet</dd>
+        @else
+        <dd class="col-sm-9">{{$process->activity_user->name}}</dd>
+        @endif
     </dl>
     <div class="container border border-dark border-rounded">
         <div id="mapid" style="height:400px;" name="map"></div>
     </div>
+    @if($process->status_id < 2) <div style="float:right;">
+        <button class="btn btn-outline-danger" onclick="if(confirm('Are you sure you wish to delete this request and all it\'s related data?')){ event.preventDefault();
+                            document.getElementById('form-delete-{{$process->id}}').submit()}">Delete</button>
+
+        <form id="{{'form-delete-'.$process->id}}" style="display:none" method="post" action="/land/delete/{{$land->id}}">
+            @csrf
+            @method('delete');
+        </form>
+</div>
+@endif
 </div>
 
 <script>

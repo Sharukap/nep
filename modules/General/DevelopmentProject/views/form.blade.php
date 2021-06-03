@@ -3,6 +3,11 @@
 @section('general')
 
 <div class="container">
+    <!-- FAQ button -->
+    <div class="d-flex mb-2 justify-content-end">
+        <span><a title="FAQ" style="font-size:24px;cursor:pointer;" data-toggle="modal" data-target="#devHelp"><i class="fa fa-info-circle" aria-hidden="true"></i></a></span>
+    </div>
+    @include('faq')
     <form action="/dev-project/saveForm" method="post">
         @csrf
 
@@ -23,19 +28,100 @@
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
-                        Organization:<input type="text" class="form-control typeahead3" placeholder="Search" name="organization" value="{{ old('organization') }}" />
+                        Forward to Organization (this will override auto assign):<input type="text" class="form-control typeahead3" placeholder="Search" name="organization" value="{{ old('organization') }}" />
                         @error('organization')
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="form-group">
-                        <label for="title">Land Title:</label>
-                        <input type="text" class="form-control" placeholder="Enter Land Title" id="landTitle" name="landTitle" value="{{ old('landTitle') }}">
-                        @error('landTitle')
+                        <label for="title">Plan Number:</label>
+                        <input type="text" class="form-control @error('planNo') is-invalid @enderror" value="{{ old('planNo') }}" placeholder="Enter Plan Number" id="planNo" name="planNo">
+                        @error('planNo')
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Surveyor Name:</label>
+                        <input type="text" class="form-control @error('surveyorName') is-invalid @enderror" value="{{ old('surveyorName') }}" placeholder="Enter Surveyor Name" id="surveyorName" name="surveyorName">
+                        @error('surveyorName')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Citizens arent allowed to fill in organization. It will automatically filled -->
+                    @if(Auth()->user()->role_id != 6 )
+                        <div class="form-group">
+                            Land Owner:<input type="text" class="form-control typeahead3 @error('land_owner') is-invalid @enderror" value="{{ old('land_owner') }}" placeholder="Search" name="land_owner" />
+                            @error('land_owner')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck1" value="1" name="checklandowner" {{ old('checklandowner') == "1" ? 'checked' : ''}}>
+                                <label class="custom-control-label" for="customCheck1"><strong>Is Unregistered</strong></label>
+                            </div>
+                        </div>
+                        <div class="extLandOwner" id="extLandOwner">
+                            <div class="form-group">
+                                <label>Land Owner Type:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="landownertype" id="landownertype1" value="1" {{(old('landownertype') == '1') ? 'checked' : ''}}>
+                                    <label class="form-check-label" for="landownertype1">
+                                        Government
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="landownertype" id="landownertype2" value="2" {{(old('landownertype') == '2') ? 'checked' : ''}}>
+                                    <label class="form-check-label" for="landownertype2">
+                                        Private
+                                    </label>
+                                </div>
+                                @error('landownertype')
+                                <div class="alert alert-danger">Please Select the Type</div>
+                                @enderror
+                            </div>
+                        </div>
+                    @endif
+                   
+                    <div id="accordion" class="mb-3">
+                        <div class="card mb-3">
+                            <div class="card-header bg-white">
+                                <a class="collapsed card-link text-dark" data-toggle="collapse" href="#collapseone">
+                                    Organizations Governing Land (Optional)
+                                </a>
+                            </div>
+                            <div id="collapseone" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    <strong>Select 1 or More</strong>
+                                    <fieldset>
+                                        @foreach($organizations as $organization)
+                                        <input type="checkbox" name="governing_orgs[]" value="{{$organization->id}}" @if( is_array(old('governing_orgs')) && in_array($organization->id, old('governing_orgs'))) checked @endif><label class="ml-2">{{$organization->title}}</label> <br>
+                                        @endforeach
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <a class="collapsed card-link text-dark" data-toggle="collapse" href="#collapsetwo">
+                                    Gazettes Relavant to Land (Optional)
+                                </a>
+                            </div>
+                            <div id="collapsetwo" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    <strong>Select 1 or More</strong>
+                                    <fieldset>
+                                        @foreach($gazettes as $gazette)
+                                        <input type="checkbox" name="gazettes[]" value="{{$gazette->id}}" @if( is_array(old('gazettes')) && in_array($gazette->id, old('gazettes'))) checked @endif> <label class="ml-2">{{$gazette->title}}</label> <br>
+                                        @endforeach
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -43,13 +129,53 @@
                     </div>
                 </div>
                 <div class="col border border-muted rounded-lg p-4">
+                    <div class="form-group">
+                        <label for="province">Province:</label>
+                        <select class="custom-select @error('province') is-invalid @enderror" name="province">
+                            <option disabled selected value="">Select</option>
+                            @foreach ($provinces as $province)
+                            <option value="{{ $province->id }}" {{ Request::old()?(Request::old('province')==$province->id?'selected="selected"':''):'' }}>{{ $province->province }}</option>
+                            @endforeach
+                        </select>
+                        @error('province')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province">District:</label>
+                        <select class="custom-select @error('district') is-invalid @enderror" name="district">
+                            <option disabled selected value="">Select</option>
+                            @foreach ($districts as $district)
+                            <option value="{{ $district->id }}" {{ Request::old()?(Request::old('district')==$district->id?'selected="selected"':''):'' }}>{{ $district->district }}</option>
+                            @endforeach
+                        </select>
+                        @error('district')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province">Grama Sevaka Division:</label>
+                        <select class="custom-select @error('gs_division') is-invalid @enderror" name="gs_division">
+                            <option disabled selected value="">Select</option>
+                            @foreach ($gs as $gs_division)
+                            <option value="{{ $gs_division->id }}" {{ Request::old()?(Request::old('gs_division')==$gs_division->id?'selected="selected"':''):'' }}>{{ $gs_division->gs_division }}</option>
+                            @endforeach
+                        </select>
+                        @error('gs_division')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <!-- ////////MAP GOES HERE -->
+                    <label>Select Location On Map*</label>
+                    <span style="float:right; cursor:pointer;"><kbd><a title="How to Draw Shapes on the Map" class="text-white" data-toggle="modal" data-target="#mapHelp">How To Mark Location</a></kbd></span>
                     <div id="mapid" style="height:400px;" name="map"></div>
                     @error('polygon')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
                     <br>
-                    <input id="polygon" type="text" class="form-control" name="polygon" value="{{request('polygon')}}">
+                    <input id="polygon" type="hidden" class="form-control" name="polygon" value="{{request('polygon')}}">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="customCheck" value="1" name="isProtected">
                         <label class="custom-control-label" for="customCheck"><strong>Check if land is a protected area</strong></label>
@@ -140,6 +266,12 @@
             //No browser support geolocation service
             geolocationErrorOccurred(false, popup, map.getCenter());
         }
+        //keeping the dynamic components open if checked
+        if ($("#customCheck1").is(':checked')) {
+            $("#extLandOwner").show();
+        } else {
+            $("#extLandOwner").hide()
+        }
     }
 
     // Set up the OSM layer 
@@ -201,6 +333,43 @@
 
         ///Converting your layer to a KML
         //$('#kml').val(tokml(drawnItems.toGeoJSON()));
+    });
+    //SEARCH FUNCTIONALITY
+    var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+
+    var results = new L.LayerGroup().addTo(map);
+
+    searchControl.on('results', function(data) {
+        results.clearLayers();
+        for (var i = data.results.length - 1; i >= 0; i--) {
+            results.addLayer(L.marker(data.results[i].latlng));
+        }
+    });
+
+    setTimeout(function() {
+        $('.pointer').fadeOut('slow');
+    }, 3400);
+
+    //toggle extra details for external land owner
+    $(function() {
+        $("#customCheck1").click(function() {
+            if ($(this).is(":checked")) {
+                $("#extLandOwner").show();
+            } else {
+                $("#extLandOwner").hide();
+            }
+        });
+    });
+
+    //toggle extra details for external requestor
+    $(function() {
+        $("#customCheck2").click(function() {
+            if ($(this).is(":checked")) {
+                $("#extRequestor").show();
+            } else {
+                $("#extRequestor").hide();
+            }
+        });
     });
 </script>
 @endsection

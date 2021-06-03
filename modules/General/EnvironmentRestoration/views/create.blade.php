@@ -3,6 +3,11 @@
 @section('general')
 
 <div class="container">
+    <!-- FAQ button -->
+    <div class="d-flex mb-2 justify-content-end">
+        <span><a title="FAQ" style="font-size:24px;cursor:pointer;" data-toggle="modal" data-target="#restorationHelp"><i class="fa fa-info-circle" aria-hidden="true"></i></a></span>
+    </div>
+    @include('faq')
     <form action="/env-restoration/store" id="envForm" method="post" autocomplete="off">
         @csrf
         <!-- One "tab" for each step in the form: -->
@@ -18,9 +23,9 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="title">Restored Land Parcel Name:</label>
-                            <input type="text" class="form-control" placeholder="Enter Land Parcel Name" name="landparceltitle">
-                            @error('landparceltitle')
+                            <label for="planNo">Restored Land Parcel Name:</label>
+                            <input type="text" class="form-control" placeholder="Enter Land Parcel Name" name="planNo">
+                            @error('planNo')
                             <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -50,39 +55,101 @@
                             <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <a class="collapsed card-link text-dark" data-toggle="collapse" href="#collapseOne">Governing Organization for selected Land Parcel (Optional)</a>
-                            </div>
-                            <div id="collapseOne" class="collapse">
-                                <div class="card-body">
-                                    @foreach($organizations as $organization)
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" name="govOrg[]" value="{{$organization->id}}">{{$organization->title}}
-                                        </label>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
                         <div class="form-group">
-                            <label for="activity_org">Organization to submit request to :</label>
-                            <input type="text" class="form-control typeahead1" placeholder="Enter Organization" id="activity_org" name="activity_org" value="{{ old('organization') }}" />
+                            <label for="activity_org">Organization to submit request to (Instead of auto assigning):</label>
+                            <input type="text" class="form-control typeahead1" placeholder="Enter Organization" id="activity_org" name="activity_org" />
                             @error('activity_org')
                             <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div id="accordion" class="mb-3">
+                            <div class="card mb-3">
+                                <div class="card-header bg-white">
+                                    <a class="collapsed card-link text-dark" data-toggle="collapse" href="#collapseone">
+                                        Organizations Governing Land (Optional)
+                                    </a>
+                                </div>
+                                <div id="collapseone" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <strong>Select 1 or More</strong>
+                                        <fieldset>
+                                            @foreach($organizations as $organization)
+                                            <input type="checkbox" name="governing_orgs[]" value="{{$organization->id}}" @if( is_array(old('governing_orgs')) && in_array($organization->id, old('governing_orgs'))) checked @endif><label class="ml-2">{{$organization->title}}</label> <br>
+                                            @endforeach
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <a class="collapsed card-link text-dark" data-toggle="collapse" href="#collapsetwo">
+                                        Gazettes Relavant to Land (Optional)
+                                    </a>
+                                </div>
+                                <div id="collapsetwo" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <strong>Select 1 or More</strong>
+                                        <fieldset>
+                                            @foreach($gazettes as $gazette)
+                                            <input type="checkbox" name="gazettes[]" value="{{$gazette->id}}" @if( is_array(old('gazettes')) && in_array($gazette->id, old('gazettes'))) checked @endif> <label class="ml-2">{{$gazette->title}}</label> <br>
+                                            @endforeach
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col border border-muted rounded-lg p-4">
+                        <div class="form-group">
+                            <label for="province">Province:</label>
+                            <select class="custom-select @error('province') is-invalid @enderror" name="province">
+                                <option disabled selected value="">Select</option>
+                                @foreach ($provinces as $province)
+                                <option value="{{ $province->id }}" {{ Request::old()?(Request::old('province')==$province->id?'selected="selected"':''):'' }}>{{ $province->province }}</option>
+                                @endforeach
+                            </select>
+                            @error('province')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="province">District:</label>
+                            <select class="custom-select @error('district') is-invalid @enderror" name="district">
+                                <option disabled selected value="">Select</option>
+                                @foreach ($districts as $district)
+                                <option value="{{ $district->id }}" {{ Request::old()?(Request::old('district')==$district->id?'selected="selected"':''):'' }}>{{ $district->district }}</option>
+                                @endforeach
+                            </select>
+                            @error('district')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="province">Grama Sevaka Division:</label>
+                            <select class="custom-select @error('gs_division') is-invalid @enderror" name="gs_division">
+                                <option disabled selected value="">Select</option>
+                                @foreach ($gs as $gs_division)
+                                <option value="{{ $gs_division->id }}" {{ Request::old()?(Request::old('gs_division')==$gs_division->id?'selected="selected"':''):'' }}>{{ $gs_division->gs_division }}</option>
+                                @endforeach
+                            </select>
+                            @error('gs_division')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <!-- ////////MAP GOES HERE -->
+                        <label>Select Location On Map*</label>
+                        <span style="float:right; cursor:pointer;"><kbd><a title="How to Draw Shapes on the Map" class="text-white" data-toggle="modal" data-target="#mapHelp">How To Mark Location</a></kbd></span>
                         <div id="mapid" style="height:400px;" name="map"></div>
 
                         @error('polygon')
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
                         <input id="polygon" type="hidden" name="polygon" class="form-control @error('polygon') is-invalid @enderror" value="{{request('polygon')}}" /> <br>
-
+                        <input id="size" type="text" class="form-control" name="size" value="{{request('size')}}">
+                        <input id="size_unit" type="text" class="form-control" name="size_unit" value="{{request('size_unit')}}">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="customCheck" value="1" name="isProtected">
                             <label class="custom-control-label" for="customCheck"><strong>Check if land is a protected area</strong></label>
@@ -105,7 +172,7 @@
                                     <tr>
                                         <th>Name</th>
                                         <th>Quantity</th>
-                                        <th>Height (in cm)</th>
+                                        <th>Height (in metres)</th>
                                         <th>Dimensions</th>
                                         <th>Remarks</th>
                                         <th></th>
@@ -118,8 +185,13 @@
                             </table>
                             <input type="hidden" class="form-control" name="status" value="1">
                             <input type="hidden" class="form-control" name="organization" value="{{Auth::user()->organization_id}}">
-                            <input type="hidden" class="form-control" name="created_by" value="{{Auth::user()->id}}">
+                            <input type="hidden" class="form-control" name="createdBy" value="{{Auth::user()->id}}">
+                            <input type="hidden" class="form-control" name="logs" value="0">
                         </form>
+                        <input type="file" id="fileUpload" name="fileUpload" accept=".xks,.xlsx" />
+                        <a type="button" name="uploadExcel" id="uploadExcel" class="btn btn-info">Import as Excel</a>
+                        <a type="button" name="clear" id="clear" class="btn btn-danger">Clear All</a>
+                        <p id="error" class="text-danger"></p>
                     </div>
                 </div>
             </div>
@@ -140,29 +212,108 @@
 </div>
 
 <script type="text/javascript">
-    //DYNAMIC SPECIES 
+    //Species Excel Sheet Import
     $(document).ready(function() {
-        var count = 1;
-        dynamic_species(count);
 
-        function dynamic_species(number) {
-            html = '<tr>';
-            html += '<input type="hidden" name="environment_restoration_id[]" class="form-control" value="" />';
-            html += '<input type="hidden" name="statusSpecies[]" class="form-control" value="1" />';
-            html += '<td><input type="text" name="species_name[]" class="form-control typeahead2" /></td>';
-            html += '<td><input type="text" name="quantity[]" class="form-control" /></td>';
-            html += '<td><input type="text" name="height[]" class="form-control" /></td>';
-            html += '<td><input type="text" name="dimension[]" class="form-control" /></td>';
-            html += '<td><input type="text" name="remark[]" class="form-control" /></td>';
+        let selectedFile;
+        console.log(window.XLSX);
+        document.getElementById('fileUpload').addEventListener("change", (event) => {
+            selectedFile = event.target.files[0];
+        })
 
-            if (number > 1) {
-                html += '<td><button type="button" name="remove" id="" class="btn btn-danger remove">Remove Species</button></td></tr>';
-                $('tbody').append(html);
-            } else {
-                html += '<td><button type="button" name="add" id="add" class="btn btn-success">Add Species</button></td></tr>';
-                $('tbody').html(html);
+        let data = [{
+            "name": "",
+            "quantity": "",
+            "height": "",
+            "dimensions": "",
+            "remarks": ""
+        }]
+
+        document.getElementById('uploadExcel').addEventListener("click", () => {
+            XLSX.utils.json_to_sheet(data, 'out.xlsx');
+            if (selectedFile) {
+                let fileReader = new FileReader();
+                fileReader.readAsBinaryString(selectedFile);
+                fileReader.onload = (event) => {
+                    let data = event.target.result;
+                    try {
+                        let workbook = XLSX.read(data, {
+                            type: "binary"
+                        });
+                    } catch (err) {
+                        document.getElementById("error").innerHTML = "Uploaded file format is not xlsx. Please upload in excel format";
+                    }
+                    let workbook = XLSX.read(data, {
+                        type: "binary"
+                    });
+                    workbook.SheetNames.forEach(sheet => {
+                        let exceldata = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet]);
+                        dynamic_species(exceldata.length, exceldata);
+                    });
+                }
             }
+        });
 
+
+        //DYNAMIC SPECIES 
+        var count = 1;
+        dynamic_species(count, null);
+
+        function dynamic_species(number, exceldata) {
+            if (exceldata == null) {
+                html = '<tr>';
+                html += '<input type="hidden" name="environment_restoration_id[]" class="form-control" value="" />';
+                html += '<input type="hidden" name="statusSpecies[]" class="form-control" value="1" />';
+                html += '<td><input type="text" id="species_name[]" name="species_name[]" class="form-control typeahead2" /></td>';
+                html += '<td><input type="text" id="quantity[]" name="quantity[]" class="form-control" /></td>';
+                html += '<td><input type="text" id="height[]" name="height[]" class="form-control" /></td>';
+                html += '<td><input type="text" id="dimension[]" name="dimension[]" class="form-control" /></td>';
+                html += '<td><input type="text" id="remark[]" name="remark[]" class="form-control" /></td>';
+
+                if (number > 1) {
+                    html += '<td><button type="button" name="remove" id="" class="btn btn-danger remove">Remove Species</button></td></tr>';
+                    $('tbody').append(html);
+                } else {
+                    html += '<td><button type="button" name="add" id="add" class="btn btn-success">Add Species</button></td></tr>';
+                    $('tbody').html(html);
+                }
+            } else {
+                let name = exceldata[0]['name'];
+                let quantity = exceldata[0]['quantity'];
+                let height = exceldata[0]['height'];
+                let dimensions = exceldata[0]['dimensions'];
+                let remarks = exceldata[0]['remarks'];
+
+                document.getElementById("species_name[]").value = name;
+                document.getElementById("quantity[]").value = quantity;
+                document.getElementById("height[]").value = height;
+                document.getElementById("dimension[]").value = dimensions;
+                document.getElementById("remark[]").value = remarks;
+
+                for (i = 1; i < (exceldata.length); i++) {
+                    name = exceldata[i]['name'];
+                    quantity = exceldata[i]['quantity'];
+                    height = exceldata[i]['height'];
+                    dimensions = exceldata[i]['dimensions'];
+                    remarks = exceldata[i]['remarks'];
+                    html = '<tr>';
+                    html += '<input type="hidden" id="environment_restoration_id" name="environment_restoration_id[]" class="form-control"  />';
+                    html += '<input type="hidden" id="status_species" name="statusSpecies[]" class="form-control" value="1" />';
+                    html += '<td><input type="text" id="species_name[]" name="species_name[]" class="form-control typeahead2" value=' + name + ' /></td>';
+                    html += '<td><input type="text" id="quantity[]" name="quantity[]" class="form-control" value=' + quantity + ' /></td>';
+                    html += '<td><input type="text" id="height[]" name="height[]" class="form-control" value=' + height + ' /></td>';
+                    html += '<td><input type="text" id="dimension[]" name="dimension[]" class="form-control" value=' + dimensions + ' /></td>';
+                    html += '<td><input type="text" id="remark[]" name="remark[]" class="form-control" value=' + remarks + ' /></td>';
+
+                    if (number > 1) {
+                        html += '<td><button type="button" name="remove" id="" class="btn btn-danger remove">Remove Species</button></td></tr>';
+                        $('tbody').append(html);
+                    } else {
+                        html += '<td><button type="button" name="add" id="add" class="btn btn-success">Add Species</button></td></tr>';
+                        $('tbody').html(html);
+                    }
+                }
+            }
             var path2 = "{{route('species')}}";
             $('input.typeahead2').typeahead({
                 source: function(terms, process) {
@@ -181,6 +332,7 @@
                 },
             });
         }
+
         $(document).on('click', '#add', function() {
             count++;
             dynamic_species(count);
@@ -189,6 +341,21 @@
         $(document).on('click', '.remove', function() {
             count--;
             $(this).closest("tr").remove();
+        });
+
+        document.getElementById('clear').addEventListener("click", () => {
+            console.log(count);
+            var table = document.getElementById("species");
+
+            while (table.rows.length > 2) {
+                table.deleteRow(2);
+            }
+            count = 1;
+            document.getElementById("species_name[]").value = "";
+            document.getElementById("quantity[]").value = "";
+            document.getElementById("height[]").value = "";
+            document.getElementById("dimension[]").value = "";
+            document.getElementById("remark[]").value = "";
         });
 
         $('#dynamic_species').on('submit', function(event) {
@@ -236,7 +403,7 @@
                 return process(objects);
             })
         },
-    });
+    }); 
 
     ///STEPPER
     var currentTab = 0; // Current tab is set to be the first tab (0)
@@ -311,7 +478,6 @@
         //... and adds the "active" class on the current step:
         x[n].className += " active";
     }
-    ///SCRIPT FOR THE MAP
     /// SCRIPT FOR THE MAP
     var map = L.map('mapid', {
         center: [7.2906, 80.6337], //if the location cannot be fetched it will be set to Kandy
@@ -407,11 +573,51 @@
 
 
         drawnItems.addLayer(layer);
-        $('#polygon').val(JSON.stringify(drawnItems.toGeoJSON())); //geoJSON converts a layer to JSON
+        $('#polygon').val(JSON.stringify(layer.toGeoJSON())); //geoJSON converts a layer to JSON
 
+        if (type === 'polygon' || type == 'rectangle') {
+            var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+            console.log((seeArea).toFixed(2));
+            $('#size').val((seeArea).toFixed(2));
+            $('#size_unit').val("Square Meters");
+        }
+        if (type === 'polyline') {
+            // Calculating the distance of the polyline
+            var tempLatLng = null;
+            var totalDistance = 0.00000;
+            $.each(e.layer._latlngs, function(i, latlng) {
+                if (tempLatLng == null) {
+                    tempLatLng = latlng;
+                    return;
+                }
+
+                totalDistance += tempLatLng.distanceTo(latlng);
+                tempLatLng = latlng;
+            });
+            e.layer.bindPopup((totalDistance).toFixed(2) + ' meters');
+            e.layer.openPopup();
+            console.log((totalDistance).toFixed(2));
+            $('#size').val((totalDistance).toFixed(2));
+            $('#size_unit').val("Meters");
+        }
         ///Converting your layer to a KML
         //$('#kml').val(tokml(drawnItems.toGeoJSON()));
     });
+    //SEARCH FUNCTIONALITY
+    var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+
+    var results = new L.LayerGroup().addTo(map);
+
+    searchControl.on('results', function(data) {
+        results.clearLayers();
+        for (var i = data.results.length - 1; i >= 0; i--) {
+            results.addLayer(L.marker(data.results[i].latlng));
+        }
+    });
+
+    setTimeout(function() {
+        $('.pointer').fadeOut('slow');
+    }, 3400);
 </script>
 
 @endsection

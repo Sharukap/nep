@@ -26,7 +26,7 @@ class EnvController extends Controller
             'eco_type' => 'required',
             'description' => 'required',
             'polygon' => 'required',
-            'district' => 'required|exists:districts,district',
+            'district' => 'required',
 
         ]);
         $ecosystems = new Env;
@@ -37,8 +37,7 @@ class EnvController extends Controller
         else{
             $ecosystems->protected_area = 0;
         }
-        $district_id1 = District::where('district', request('district'))->pluck('id');
-        $ecosystems->district_id = $district_id1[0];
+        $ecosystems->district_id = $request->district;
         $ecosystems->title = $request->input('title');
         $ecosystems->polygon = request('polygon');
         $ecosystems->description = $request->input('description');
@@ -62,7 +61,11 @@ class EnvController extends Controller
     {
 
         $data = Env_type::all();
-        return view('environment::request')->with('data', $data);
+        $districts = District::all();
+        return view('environment::request',[
+            'districts' => $districts,
+            'data' => $data,
+        ]);
     }
 
 

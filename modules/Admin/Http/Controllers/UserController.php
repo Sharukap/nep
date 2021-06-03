@@ -26,14 +26,14 @@ class UserController extends Controller
     {
         $organizations = Organization::all();
         $designations = Designation::all();
-        if(Auth::user()->role_id == 1 ||Auth::user()->role_id == 2){
+        if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2) {
             $roles = Role::where('id', '>', 1)->get();
-        } elseif(Auth::user()->role_id == 3){
+        } elseif (Auth::user()->role_id == 3) {
             $roles = Role::where('id', '>', 3)->get();
         } elseif (Auth::user()->role_id == 4) {
             $roles = Role::where('id', '>', 4)->get();
         }
-                        
+
         return view('admin::create', [
             'designations' => $designations,
             'organizations' => $organizations,
@@ -147,6 +147,45 @@ class UserController extends Controller
             default:            //Else display the unauthorized view.
                 return view('admin::unauthorized');
         }
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $role = Auth::user()->role_id;
+        $org = Auth::user()->organization_id;
+
+        $search = $request->get('search');
+
+        if ($role == 1) {
+            $users = User::select()
+                ->where("name", "LIKE", '%' . $search . '%')
+                ->where('status', '=', 1)
+                ->get();
+        } else {
+            $users = User::select()
+                ->where("name", "LIKE", '%' . $search . '%')
+                ->where('status', '=', 1)
+                ->where('role_id', '>', $role)
+                ->where('organization_id', '=', $org)
+                ->get();
+        }
+
+        return view('admin::index', [
+            'users' => $users,
+        ]);
+    }
+
+    public function searchSelfRegistered(Request $request)
+    {
+        $search = $request->get('search');
+        $users = User::select()
+            ->where("name", "LIKE", '%' . $search . '%')
+            ->where('status', '=', 0)
+            ->get();
+
+        return view('admin::admin.selfRegistered', [
+            'users' => $users,
+        ]);
     }
 
     // Function to reset the password.

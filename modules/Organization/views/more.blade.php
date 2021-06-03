@@ -35,9 +35,30 @@
                 <div class="col">
                 <strong>Organization Type :</strong>
                 </div>
+                @if($organization->type_id == NULL)
+                <div class="col">
+                    Not assigned
+                </div> 
+                @else
                 <div class="col">
                     {{$organization->type->title}}
                 </div> 
+                @endif
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                <strong>Organization Branch Type :</strong>
+                </div>
+                @if($organization->branch_type_id == NULL)
+                <div class="col">
+                    Not specified
+                </div> 
+                @else
+                <div class="col">
+                    {{$organization->branch_type->title}}
+                </div> 
+                @endif
             </div>
             <br>
             <div class="row">
@@ -68,7 +89,7 @@
             <br>
             <div class="row">
                 <div class="col">
-                <strong>Descroption :</strong>
+                <strong>Description :</strong>
                 </div>
                 <div class="col">
                 {{ $organization->description }}
@@ -98,9 +119,6 @@
 
                 </tbody>
             </table>
-
-
-
             <br>
             </form>
         </div>
